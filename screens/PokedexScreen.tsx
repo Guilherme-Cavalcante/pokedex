@@ -8,17 +8,21 @@ export const PokedexScreen = () => {
     const [pokemons, setPokemons] = useState<Pokemon[]>([]);
     const [search, setSearch] = useState('');
     const [errorLoading, setErrorLoading] = useState(false);
+    const [offset, setOffset] = useState(0);
+    const [loadingNewPokemons, setLoadingNewPokemons] = useState(true);
 
     useEffect(() => {
         const fetchData = async () => {
-            const list = await getPokemons(30); // primeiros 30 pokemons
+            const list = await getPokemons(30, offset); // primeiros 30 pokemons
             list.length <= 0 && setErrorLoading(true);
             //   if (list.length <= 0) setErrorLoading(true);
             const details = await Promise.all(list.map(p => getPokemonDetails(p.url)));
-            setPokemons(details);
+            setPokemons(pokemons.concat(details));
         };
         fetchData();
-    }, []);
+        setLoadingNewPokemons(false);
+        // console.log(offset)
+    }, [offset]);
 
     const filtered = pokemons.filter(p => p.name.includes(search.toLowerCase()));
 
@@ -45,14 +49,26 @@ export const PokedexScreen = () => {
                 renderItem={({ item }) => <PokemonCard pokemon={item} />}
                 ListEmptyComponent={
                     <Text style={styles.input}>{
-                        (search != "" && 
-                        `Nenhum Pokémon encontrado para ${search}.`) ||
-                        "Nenhum Pokémon para exibir no momento."   
+                        (search != "" &&
+                            `Nenhum Pokémon encontrado para ${search}.`) ??
+                        (!loadingNewPokemons &&
+                        "Nenhum Pokémon para exibir no momento.")
                     }</Text>
                 }
+                onEndReached={({ distanceFromEnd = 3 }) => filtered.length >= 27 && !loadingNewPokemons && loadMorePokemons()}
+                ListFooterComponent={<ActivityIndicator></ActivityIndicator>}
             />
+            {/* {
+                loadingNewPokemons && 
+                <ActivityIndicator></ActivityIndicator>
+            } */}
         </View>
     );
+
+    function loadMorePokemons() {
+        setOffset(offset => offset + 30);
+        setLoadingNewPokemons(true);
+    }
 };
 
 const styles = StyleSheet.create({
