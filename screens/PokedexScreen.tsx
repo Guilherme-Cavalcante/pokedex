@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { use, useEffect, useState } from 'react';
 import { View, Text, FlatList, TextInput, StyleSheet, ActivityIndicator } from 'react-native';
 import { getPokemons, getPokemonDetails } from '../services/api';
 import { Pokemon } from '../types/Pokemon';
@@ -7,10 +7,13 @@ import { PokemonCard } from '../components/PokemonCard';
 export const PokedexScreen = () => {
   const [pokemons, setPokemons] = useState<Pokemon[]>([]);
   const [search, setSearch] = useState('');
+  const [errorLoading, setErrorLoading] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       const list = await getPokemons(30); // primeiros 30 pokemons
+      list.length <= 0 && setErrorLoading(true);
+    //   if (list.length <= 0) setErrorLoading(true);
       const details = await Promise.all(list.map(p => getPokemonDetails(p.url)));
       setPokemons(details);
     };
@@ -30,6 +33,10 @@ export const PokedexScreen = () => {
       {
         pokemons.length <= 0 && 
         <ActivityIndicator></ActivityIndicator>
+      }
+      {
+        errorLoading &&
+        <Text style={styles.title}>Falha ao carregar Pokémons. Verifique sua conexão.</Text>
       }
       <FlatList
         data={filtered}
