@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TextInput, StyleSheet } from 'react-native';
+import { View, Text, FlatList, TextInput, StyleSheet, ActivityIndicator } from 'react-native';
 import { getPokemons, getPokemonDetails } from '../services/api';
 import { Pokemon } from '../types/Pokemon';
 import { PokemonCard } from '../components/PokemonCard';
@@ -27,6 +27,10 @@ export const PokedexScreen = () => {
         style={styles.input}
         onChangeText={setSearch}
       />
+      {
+        pokemons.length <= 0 && 
+        <ActivityIndicator></ActivityIndicator>
+      }
       <FlatList
         data={filtered}
         keyExtractor={item => item.id.toString()}
