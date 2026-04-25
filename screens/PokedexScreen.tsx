@@ -3,6 +3,8 @@ import { View, Text, FlatList, TextInput, StyleSheet, ActivityIndicator } from '
 import { getPokemons, getPokemonDetails } from '../services/api';
 import { Pokemon } from '../types/Pokemon';
 import { PokemonCard } from '../components/PokemonCard';
+import { capitalize } from '../utils/format';
+import { EdgeInsets, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export const PokedexScreen = () => {
     const [pokemons, setPokemons] = useState<Pokemon[]>([]);
@@ -11,23 +13,24 @@ export const PokedexScreen = () => {
     const [offset, setOffset] = useState(0);
     const [loadingNewPokemons, setLoadingNewPokemons] = useState(true);
 
+    const insets = useSafeAreaInsets();
+
     useEffect(() => {
         const fetchData = async () => {
             const list = await getPokemons(30, offset); // primeiros 30 pokemons
             list.length <= 0 && setErrorLoading(true);
-            //   if (list.length <= 0) setErrorLoading(true);
             const details = await Promise.all(list.map(p => getPokemonDetails(p.url)));
             setPokemons(pokemons.concat(details));
         };
         fetchData();
         setLoadingNewPokemons(false);
-        // console.log(offset)
     }, [offset]);
 
-    const filtered = pokemons.filter(p => p.name.includes(search.toLowerCase()));
+    const filtered = pokemons.filter(pokemon => pokemon.name.includes(search.toLowerCase()));
+    filtered.forEach(pokemon => pokemon.name = capitalize(pokemon.name));
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, { paddingTop: insets.top }]}>
             <Text style={styles.title}>Pokédex</Text>
             <TextInput
                 placeholder="Buscar pokémon..."
@@ -58,10 +61,6 @@ export const PokedexScreen = () => {
                 onEndReached={({ distanceFromEnd = 3 }) => filtered.length >= 27 && !loadingNewPokemons && loadMorePokemons()}
                 ListFooterComponent={<ActivityIndicator></ActivityIndicator>}
             />
-            {/* {
-                loadingNewPokemons && 
-                <ActivityIndicator></ActivityIndicator>
-            } */}
         </View>
     );
 
@@ -72,7 +71,7 @@ export const PokedexScreen = () => {
 };
 
 const styles = StyleSheet.create({
-    container: { flex: 1, paddingTop: 60, paddingHorizontal: 16 },
+    container: { flex: 1, paddingHorizontal: 16 },
     title: { fontSize: 32, fontWeight: 'bold', marginBottom: 12 },
     input: {
         backgroundColor: '#f1f1f1',
