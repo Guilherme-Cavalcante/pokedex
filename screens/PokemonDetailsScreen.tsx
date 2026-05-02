@@ -2,15 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, ActivityIndicator, ScrollView } from 'react-native';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import { RootStackParamList } from '../types/Navigation';
-import { Pokemon } from '../types/Pokemon'; 
+import { Pokemon } from '../types/Pokemon';
 import { getPokemonById } from '../services/api';
 import { capitalize } from '../utils/format';
 
 type PokemonDetailsScreenRouteProp = RouteProp<RootStackParamList, 'PokemonDetails'>;
 
 export const PokemonDetailsScreen = () => {
-    const route = useRoute<PokemonDetailsScreenRouteProp>();
-    const { pokemonId } = route.params;
+  const route = useRoute<PokemonDetailsScreenRouteProp>();
+  const { pokemonId } = route.params;
 
   const [pokemon, setPokemon] = useState<Pokemon | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -51,7 +51,7 @@ export const PokemonDetailsScreen = () => {
       <Image source={pokemon.image} style={styles.image} />
       <Text style={styles.name}>{capitalize(pokemon.name)}</Text>
       <Text style={styles.idText}>ID: #{pokemon.id}</Text>
-      
+
       <View style={styles.typesContainer}>
         <Text style={styles.sectionTitle}>Tipos:</Text>
         {pokemon.types.map((type) => (
@@ -83,7 +83,7 @@ const styles = StyleSheet.create({
     width: 200,
     height: 200,
     marginBottom: 16,
-    backgroundColor: '#f0f0f0', 
+    backgroundColor: '#f0f0f0',
     borderRadius: 100,
   },
   name: {
@@ -105,7 +105,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginBottom: 8,
   },
-  typeText: { 
+  typeText: {
     fontSize: 16,
     marginHorizontal: 4,
     paddingVertical: 4,
